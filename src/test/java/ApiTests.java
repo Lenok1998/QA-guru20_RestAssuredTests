@@ -4,16 +4,9 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
 
-public class LoginTests {
- /*
-    1. Make request (POST) to https://reqres.in/api/login
-        with body { "email": "eve.holt@reqres.in", "password": "cityslicka" }
-    2. Get response { "token": "QpwL5tke4Pnpja7X4" }
-    3. Check "token" is "QpwL5tke4Pnpja7X4" and status code 200
-  */
-
+public class ApiTests {
     @Test
-    void successfulLoginTest() {
+    void successfulRegisterTest() {
         String authData = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
 
         given()
@@ -22,7 +15,7 @@ public class LoginTests {
                 .log().uri()
 
         .when()
-            .post("https://reqres.in/api/login")
+            .post("https://reqres.in/api/register")
 
         .then()
             .log().status()
@@ -32,15 +25,15 @@ public class LoginTests {
     }
 
     @Test
-    void unsuccessfulLogin400Test() {
-        String authData = "";
+    void unsuccessfulRegister400Test() {
+        String regData = "";
 
         given()
-                .body(authData)
+                .body(regData)
                 .log().uri()
 
         .when()
-            .post("https://reqres.in/api/login")
+            .post("https://reqres.in/api/register")
 
         .then()
             .log().status()
@@ -49,36 +42,18 @@ public class LoginTests {
             .body("error", is("Missing email or username"));
     }
 
-    @Test
-    void userNotFoundTest() {
-        String authData = "{\"email\": \"eveasdas.holt@reqres.in\", \"password\": \"cda\"}";
-
-        given()
-                .body(authData)
-                .contentType(JSON)
-                .log().uri()
-
-                .when()
-                .post("https://reqres.in/api/login")
-
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(400)
-                .body("error", is("user not found"));
-    }
 
     @Test
     void missingPasswordTest() {
-        String authData = "{\"email\": \"eveasdas.holt@reqres.in\"}";
+        String regData = "{\"email\": \"lala.holt@reqres.in\"}";
 
         given()
-                .body(authData)
+                .body(regData)
                 .contentType(JSON)
                 .log().uri()
 
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("https://reqres.in/api/register")
 
                 .then()
                 .log().status()
@@ -90,15 +65,15 @@ public class LoginTests {
 
     @Test
     void missingLoginTest() {
-        String authData = "{\"password\": \"cda\"}";
+        String regData = "{\"password\": \"123\"}";
 
         given()
-                .body(authData)
+                .body(regData)
                 .contentType(JSON)
                 .log().uri()
 
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("https://reqres.in/api/register")
 
                 .then()
                 .log().status()
@@ -108,15 +83,15 @@ public class LoginTests {
     }
     @Test
     void wrongBodyTest() {
-        String authData = "%}";
+        String regData = ".}";
 
         given()
-                .body(authData)
+                .body(regData)
                 .contentType(JSON)
                 .log().uri()
 
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("https://reqres.in/api/register")
 
                 .then()
                 .log().status()
@@ -125,13 +100,47 @@ public class LoginTests {
     }
 
     @Test
-    void unsuccessfulLogin415Test() {
+    void unsuccessfulRegister415Test() {
         given()
                 .log().uri()
-                .post("https://reqres.in/api/login")
+                .post("https://reqres.in/api/register")
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(415);
     }
-}
+    @Test
+    void listUserTest() {
+            given()
+                    .when()
+                    .get("https://reqres.in/api/users?page=2")
+                    .then()
+                    .body("page", is(2));
+        }
+
+    @Test
+    void createUserTest() {
+        String creData = "{\"name\": \"morpheus\", \"job\": \"leader\"}" ;
+
+        given()
+                .body(creData)
+                .contentType(JSON)
+                .log().uri()
+
+                .when()
+                .post("https://reqres.in/api/users")
+
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(201)
+                .body("name", is("morpheus"));
+    }
+
+    }
+
+
+
+
+
+
